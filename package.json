@@ -13,7 +13,7 @@
     "css-loader": "^5.2.6",
     "konva": "^8.1.1",
     "node-sass": "^6.0.1",
-    "sass-loader": "^12.1.0",
+    "sass-loader": "^10",
     "ts-loader": "3.5.0",
     "vue": "^2.6.11",
     "vue-material": "1.0.0-beta-10.2",
