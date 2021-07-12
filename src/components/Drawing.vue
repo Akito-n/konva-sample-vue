@@ -86,7 +86,7 @@ export default {
 
     // イベント追加
     //タップには(electron)ならpointerdown, pointerupがある、pointer系はsafari非対応っぽい
-    //pcでもpointer_xxx系はつかえるので統一でもいいかも
+    //pcでもpointer_xxx系はつかえるので統一でもいいかも、タブレット系ならontouchmoveとかになる
     this.drawingScope.on('mousedown', this.mousedown)
     this.stage.addEventListener('mouseup', this.mouseup)
     // electronならpointermove
