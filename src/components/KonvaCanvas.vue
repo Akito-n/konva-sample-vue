@@ -49,6 +49,7 @@ import Drawing from './Drawing.vue'
 export default {
   name: 'KonvaCanvas',
   components: { Drawing },
+  //このプロパティを変更して相手方に渡せば色や状態を変更できる
   data: () => ({
     mode: '',
     brushColor: '',
@@ -68,6 +69,7 @@ export default {
     clearCanvas: function(){
       this.$refs.drawing.onClearCanvas()
     },
+    //子のundo, redoを呼ぶ。戻る、進む
     undo: function(){
       this.$refs.drawing.undo()
     },

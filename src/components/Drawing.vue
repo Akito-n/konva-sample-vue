@@ -52,39 +52,50 @@ export default {
     redoStack: []
   }),
   mounted: function () {
+    //描画領域の親を指定して取得する
     var container = this.$refs.container;
+    // https://konvajs.org/api/Konva.Stage.html#toc1__anchor
+    // 複数レイヤに対応するためにこいつを使う。主に画像のため。
     this.stage = new Konva.Stage({
       container,
       width: this.width,
       height: this.height
     })
+    // konva layer
     this.drawingLayer = new Konva.Layer()
+    // 描画用のレイヤーを上に重ねる
     this.stage.add(this.drawingLayer)
-
+    //キャンバス要素を取得
     this.canvas = this.$refs.canvas
+    //描画範囲を規定する。x, y は画面によって要変更。imageの上に描画を重ねるイメージ
     this.drawingScope = new Konva.Image({
       image: this.canvas,
       x: this.width / 4,
       y: 5,
       stroke: 'black'
     })
+    //描画エリアを重ねる
     this.drawingLayer.add(this.drawingScope)
     this.stage.draw()
-
+    // 2dグラフィックの画像描画指定
     this.context = this.canvas.getContext('2d')
     this.context.strokeStyle = this.brushColor
+    //線の形状指定
     this.context.lineJoin = 'round'
     this.context.lineWidth = 5
 
     // イベント追加
+    //タップには(electron)ならpointerdown, pointerupがある、pointer系はsafari非対応っぽい
+    //pcでもpointer_xxx系はつかえるので統一でもいいかも
     this.drawingScope.on('mousedown', this.mousedown)
     this.stage.addEventListener('mouseup', this.mouseup)
-    // electronならpointermove, pcでもpointermoveはつかえるので統一でもいいかも
+    // electronならpointermove
     this.stage.addEventListener('mousemove', this.mousemove)
     this.drawingScope.on('touchstart', this.mousedown)
     this.stage.addEventListener('touchend', this.mouseup)
     this.stage.addEventListener('touchmove', this.mousemove)
 
+    //実際のタイミングだとマウント時じゃないかも
     this.imageObj = new Image()
     this.imageObj.addEventListener('load', this.imageOnload)
     this.imageObj.src = this.backgroundImage
@@ -93,12 +104,13 @@ export default {
     mousedown: function () {
       this.isPaint = true
 
-      // マウスダウン時の座標を取得しておく
+      // ポインターの位置を取得
       this.lastPointerPosition = this.stage.getPointerPosition()
-
-      this.undoStack.push(this.context.getImageData(0,0,this.canvas.width, this.canvas.height))
+      // undo配列にこの動作を記憶させる、が、不完全なのでコメントアウト
+      // this.undoStack.push(this.context.getImageData(0,0,this.canvas.width, this.canvas.height))
     },
     mouseup: function () {
+      //ペイントの終了state
       this.isPaint = false
     },
     mousemove: function () {
@@ -111,9 +123,10 @@ export default {
       }
       // 消しゴムモード時
       if (this.isTargetMode('eraser')) {
+        //ここに誰の？とかで分岐できる可能性がある
         this.context.globalCompositeOperation = 'destination-out';
       }
-
+      // 今のパスをリセットする。
       this.context.beginPath()
 
       this.localPos.x = this.lastPointerPosition.x - this.drawingScope.x()
@@ -127,6 +140,7 @@ export default {
       this.localPos.y = this.pos.y - this.drawingScope.y()
 
       // 描画開始座標から、lineToに指定された座標まで描画する
+      // ライブラリというよりcanvas要素の描画系操作
       this.context.lineTo(this.localPos.x, this.localPos.y)
       this.context.closePath()
       this.context.stroke()
@@ -135,10 +149,13 @@ export default {
       this.lastPointerPosition = this.pos
     },
     onClearCanvas: function () {
+      // 消すというよりも描画領域を切り取っている
       this.context.globalCompositeOperation = 'destination-out'
       this.context.fillRect(0, 0, this.width, this.height)
       this.drawingLayer.draw()
-      this.undoStack.push(this.context.getImageData(0, 0, this.canvas.width, this.canvas.height))
+
+      // 消すタイミングで直前の状態をスタック
+      //this.undoStack.push(this.context.getImageData(0, 0, this.canvas.width, this.canvas.height))
 
       this.$emit('on-reset')
     },
@@ -146,7 +163,8 @@ export default {
     isTargetMode: function (targetMode) {
       return this.mode === targetMode
     },
-
+    
+    // 画像がある場合、こいつをコールする。やってることはmountの時のキャンバス描画とほぼ一緒
     imageOnload: function() {
       if(!this.backgroundImage) return
       this.backGroundLayer = new Konva.Layer()
@@ -164,6 +182,7 @@ export default {
 
       this.backGroundLayer.moveToBottom()
     },
+    // undo,redoは使わない
     undo: function(){
       if(this.undoStack.length == 0){
         return
