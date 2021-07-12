@@ -28,7 +28,7 @@
               </md-button>
             </md-field>
             <!-- 不完全。undo -> redo で次にundoになる対象が2つ前になってしまう。ちゃんとやるならundostack, redostackにマスタースタックみたいなのが要るかも -->
-            <md-field style="float: left; margin-top: -8px">
+            <!-- <md-field style="float: left; margin-top: -8px">
               <md-button class="md-dense md-raised md-transparent" @click="redo">
                 進む
               </md-button>
@@ -37,7 +37,7 @@
               <md-button class="md-dense md-raised md-transparent" @click="undo">
                 戻る
               </md-button>
-            </md-field>
+            </md-field> -->
           </div>
         </div>
       <Drawing :mode="this.mode" :brushColor="this.brushColor" :backgroundImage="bgImage" ref="drawing" />
